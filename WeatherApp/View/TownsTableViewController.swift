@@ -70,6 +70,7 @@ class TownsTableViewController: UITableViewController {
         self.tableView.tableHeaderView = detailStatusBarImage
         self.tableView.delegate = self
         self.tableView.dataSource = self
+        self.tableView.dragInteractionEnabled = true
         self.tableView.register(TownTableViewCell.self, forCellReuseIdentifier: "cell")
         self.tableView.contentInsetAdjustmentBehavior = .never
         self.tableView.tableFooterView = buttonFooter
@@ -85,6 +86,8 @@ class TownsTableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setNeedsStatusBarAppearanceUpdate()
+//        tableView.isEditing = true
+//        tableView.allowsSelectionDuringEditing = true
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -152,7 +155,6 @@ class TownsTableViewController: UITableViewController {
         }
     }
 
-    
     // MARK: - Table view data source
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return citiesArray.count
@@ -171,6 +173,7 @@ class TownsTableViewController: UITableViewController {
         cell1.sendSubviewToBack(cell1.townCellBackgroundImage)
  
         cell1.configure(wit: weather)
+       
         return cell1
     }
     
@@ -190,7 +193,15 @@ class TownsTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
+//    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+//        return .none
+//    }
+//
+//    override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
+//        return false
+//    }
     
+
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, completion in
 
@@ -204,6 +215,22 @@ class TownsTableViewController: UITableViewController {
             }
         }
         return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+    
+    
+    //for move
+    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let moveObjectName = cityArrayName.remove(at: sourceIndexPath.row)
+        let moveObjectArray = citiesArray.remove(at: sourceIndexPath.row)
+        
+        cityArrayName.insert(moveObjectName, at: destinationIndexPath.row)
+        citiesArray.insert(moveObjectArray, at: destinationIndexPath.row)
+        
+        tableView.reloadData()
     }
     
 
@@ -240,6 +267,7 @@ extension String {
         return String(unicodeScalars.filter(CharacterSet.letters.contains))
     }
 }
+
 
 //extension TownsTableViewController {
 //    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
